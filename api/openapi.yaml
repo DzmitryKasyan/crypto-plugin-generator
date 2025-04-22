@@ -1,0 +1,98 @@
+openapi: 3.0.2
+info:
+  title: Описание API
+  version: v1.0.0
+servers:
+- url: /
+paths:
+  /sign:
+    post:
+      operationId: signRaw
+      requestBody:
+        $ref: '#/components/requestBodies/SignInput'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sign_output'
+          description: Данные получены
+        "400":
+          content:
+            application/json:
+              example:
+                status: Error
+                error: field Message is a required field
+              schema:
+                $ref: '#/components/schemas/invalid_data'
+          description: Ошибка валидации
+        "500":
+          description: Ошибка сервера
+      summary: Выработка raw подписи
+      tags:
+      - Подписание
+components:
+  requestBodies:
+    SignInput:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/sign_input'
+      required: true
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          example:
+            status: Error
+            error: field Message is a required field
+          schema:
+            $ref: '#/components/schemas/invalid_data'
+      description: Ошибка валидации
+    InternalError:
+      description: Ошибка сервера
+  schemas:
+    sign_input:
+      properties:
+        message:
+          description: Данные в base64
+          type: string
+        provider:
+          description: "cryptopro - для работы с провайдером КриптоПРО  \navest -\
+            \ для работы с провайдером Avest\n"
+          enum:
+          - cryptopro
+          - avest
+          type: string
+      required:
+      - message
+      - provider
+      type: object
+    sign_output:
+      example:
+        sign: sign
+        status: status
+      properties:
+        status:
+          description: Статус выполнения
+          format: byte
+          type: string
+        sign:
+          description: Выработанная подпись
+          format: byte
+          type: string
+      type: object
+    invalid_data:
+      example:
+        error: error
+        status: status
+      properties:
+        status:
+          description: Статус
+          format: byte
+          type: string
+        error:
+          description: Ошибка
+          format: byte
+          type: string
+      type: object
